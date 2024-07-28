@@ -1,4 +1,5 @@
-﻿using Basis.Biblioteca.Application.UseCases.Assunto.Search;
+﻿using Asp.Versioning;
+using Basis.Biblioteca.Application.UseCases.Assunto.Search;
 using Basis.Biblioteca.Application.UseCases.Autor.Search;
 using Basis.Biblioteca.Application.UseCases.Livro.Create;
 using Basis.Biblioteca.Application.UseCases.Livro.Search;
@@ -7,6 +8,7 @@ using Basis.Biblioteca.Infrastructure.Persistence.SqlServer;
 using Basis.Biblioteca.Infrastructure.Persistence.SqlServer.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.DependencyInjection.Extensions;
 
@@ -47,10 +49,43 @@ public static class HostingExtensions
         builder.Services.AddScoped<ILivroRepository, LivroRepository>();
 
         // Adiciona outros serviços
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+        }).AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["controller"]}_{e.RelativePath}_{e.HttpMethod}");
+            options.DescribeAllParametersInCamelCase();
+            options.IncludeXmlComments(XmlCommentsFilePath);
+        });
 
         return builder;
+    }
+
+    private static string XmlCommentsFilePath
+    {
+        get
+        {
+            var programAssembly = typeof(Program).Assembly;
+            var basePath = Path.GetDirectoryName(programAssembly.Location);
+            var fileName = $"{programAssembly.GetName().Name}.xml";
+            return Path.Combine(basePath!, fileName);
+        }
     }
 }

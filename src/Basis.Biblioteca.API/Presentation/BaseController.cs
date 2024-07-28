@@ -68,7 +68,7 @@ public class BaseController : ControllerBase
 
         var response = new ApiBaseResponse<object>
         {
-            Status = (int)statusCode,
+            Success = true,
             Data = value
         };
 
@@ -89,7 +89,7 @@ public class BaseController : ControllerBase
 
         var result = new ApiBaseResponse<object>
         {
-            Status = (int)HttpStatusCode.UnprocessableEntity,
+            Success = false,
             Data = null,
             Errors = error.Errors
         };
