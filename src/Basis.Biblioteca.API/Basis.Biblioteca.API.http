@@ -1,0 +1,6 @@
+@Basis.Biblioteca.API_HostAddress = http://localhost:5164
+
+GET {{Basis.Biblioteca.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
