@@ -1,4 +1,5 @@
-﻿using Basis.Biblioteca.Domain.Repositories;
+﻿using Basis.Biblioteca.Application.Common.DTOs;
+using Basis.Biblioteca.Domain.Repositories;
 using ErrorOr;
 
 namespace Basis.Biblioteca.Application.UseCases.Assunto.Search;
@@ -8,11 +9,12 @@ public record SearchAssuntoRequest
     public string? Nome { get; set; }
 }
 
-public class SearchAssuntoResult : List<Domain.Entities.Assunto>
+public class SearchAssuntoResult : List<AssuntoDto>
 {
     public SearchAssuntoResult(IEnumerable<Domain.Entities.Assunto> assuntos)
     {
-        AddRange(assuntos);
+        foreach (var assunto in assuntos)
+            Add(new AssuntoDto { CodAs = assunto.CodAs, Descricao = assunto.Descricao });
     }
 }
 

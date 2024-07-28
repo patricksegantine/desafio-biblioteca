@@ -1,25 +1,23 @@
-var builder = WebApplication.CreateBuilder(args);
+using Basis.Biblioteca.API.Middleares;
+using Microsoft.DependencyInjection.Extensions;
+using Serilog;
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var builder = WebApplication.CreateBuilder(args)
+    .ConfigureServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
+
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.Run();
+app.UseMiddleware<ExceptionMiddleware>();
+await app.RunAsync();

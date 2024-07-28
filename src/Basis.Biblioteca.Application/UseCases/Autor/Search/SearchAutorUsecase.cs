@@ -1,4 +1,5 @@
-﻿using Basis.Biblioteca.Domain.Repositories;
+﻿using Basis.Biblioteca.Application.Common.DTOs;
+using Basis.Biblioteca.Domain.Repositories;
 using ErrorOr;
 
 namespace Basis.Biblioteca.Application.UseCases.Autor.Search;
@@ -8,11 +9,12 @@ public record SearchAutorRequest
     public string? Nome { get; set; }
 }
 
-public class SearchAutorResult : List<Domain.Entities.Autor>
+public class SearchAutorResult : List<AutorDto>
 {
     public SearchAutorResult(IEnumerable<Domain.Entities.Autor> autores)
     {
-        AddRange(autores);
+        foreach (var autor in autores)
+            Add(new AutorDto { CodAu = autor.CodAu, Nome = autor.Nome });
     }
 }
 
