@@ -58,7 +58,15 @@ public static class HostingExtensions
         // AutoMapper
         builder.Services.AddAutoMapper(m => m.AddProfile<CustomProfile>());
 
-        // Adiciona outros serviços
+        // CORS
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+                builder => builder.WithOrigins("http://localhost:4200")
+                                  .AllowAnyMethod()
+                                  .AllowAnyHeader());
+        });
+
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
