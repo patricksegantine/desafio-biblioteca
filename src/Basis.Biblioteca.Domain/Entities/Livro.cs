@@ -11,4 +11,18 @@ public class Livro : AuditableEntity
     public List<Autor> Autores { get; set; } = [];
     public List<Assunto> Assuntos { get; set; } = [];
     public List<PrecoVenda> Precos { get; set; } = [];
+
+    public void Update(string? titulo, string? editora, int? edicao, string? anoPublicacao)
+    {
+        if (!string.IsNullOrWhiteSpace(titulo))
+            Titulo = titulo;
+
+        if (!string.IsNullOrWhiteSpace(editora))
+            Editora = editora;
+
+        if (!string.IsNullOrWhiteSpace(anoPublicacao))
+            AnoPublicacao = anoPublicacao;
+
+        Edicao = edicao ?? Edicao;
+    }
 }
