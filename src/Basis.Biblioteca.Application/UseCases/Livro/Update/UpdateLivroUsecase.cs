@@ -33,21 +33,19 @@ public sealed class UpdateLivroUsecase(
             request.AnoPublicacao
         );
 
-        // Validar Autores
-        livro = ProcessDeletedAutores(livro, request.Autores);
+        livro = await ProcessAutores(livro, request.Autores, cancellationToken);
 
-        // Validar Assuntos
-        livro = ProcessDeletedAssuntos(livro, request.Assuntos);
+        livro = await ProcessAssuntos(livro, request.Assuntos, cancellationToken);
 
-        // Validar Precos
-        livro = ProcessDeletedPrecos(livro, request.Precos);
+        livro = ProcessPrecos(livro, request.Precos);
+
 
         await _livroRepository.UpdateAsync(livro, cancellationToken);
 
         return Result.Updated;
     }
 
-    private static Domain.Entities.Livro ProcessDeletedAutores(Domain.Entities.Livro livro, List<UpdateAutorDto>? autores)
+    private async Task<Domain.Entities.Livro> ProcessAutores(Domain.Entities.Livro livro, List<UpdateAutorDto>? autores, CancellationToken cancellationToken)
     {
         if (autores is null || autores.Count == 0)
             return livro;
@@ -65,10 +63,20 @@ public sealed class UpdateLivroUsecase(
             livro.Autores.Remove(autor);
         }
 
+        var addedAutoresIds = autores.Where(a => a.UpdateAction == UpdateActionType.Added)
+                                    .Select(a => a.CodAu)
+                                    .Except(livro.Autores.Select(a => a.CodAu).ToList())
+                                    .ToList();
+        if (addedAutoresIds.Count > 0)
+        {
+            var addedAutores = await _autorRepository.GetByIdsAsync(addedAutoresIds, cancellationToken);
+            livro.Autores.AddRange(addedAutores);
+        }
+
         return livro;
     }
 
-    private Domain.Entities.Livro ProcessDeletedAssuntos(Domain.Entities.Livro livro, List<UpdateAssuntoDto>? assuntos)
+    private async Task<Domain.Entities.Livro> ProcessAssuntos(Domain.Entities.Livro livro, List<UpdateAssuntoDto>? assuntos, CancellationToken cancellationToken)
     {
         if (assuntos is null || assuntos.Count == 0)
             return livro;
@@ -86,10 +94,20 @@ public sealed class UpdateLivroUsecase(
             livro.Assuntos.Remove(assunto);
         }
 
+        var addedAssuntosIds = assuntos.Where(a => a.UpdateAction == UpdateActionType.Added)
+                                        .Select(a => a.CodAs)
+                                        .Except(livro.Assuntos.Select(a => a.CodAs).ToList())
+                                        .ToList();
+        if (addedAssuntosIds.Count > 0)
+        {
+            var addedAssuntos = await _assuntoRepository.GetByIdsAsync(addedAssuntosIds, cancellationToken);
+            livro.Assuntos.AddRange(addedAssuntos);
+        }
+
         return livro;
     }
 
-    private Domain.Entities.Livro ProcessDeletedPrecos(Domain.Entities.Livro livro, List<UpdatePrecoVendaDto>? precos)
+    private Domain.Entities.Livro ProcessPrecos(Domain.Entities.Livro livro, List<UpdatePrecoVendaDto>? precos)
     {
         if (precos is null || precos.Count == 0)
             return livro;
@@ -107,6 +125,29 @@ public sealed class UpdateLivroUsecase(
             livro.Precos.Remove(preco);
         }
 
+        var addedPrecos = precos.Where(a => a.UpdateAction == UpdateActionType.Added)
+                                .Select(p => new PrecoVenda
+                                {
+                                    TipoDeVenda = p.TipoDeVenda,
+                                    Preco = p.Preco,
+                                })
+                                .ToList();
+        if (addedPrecos.Count > 0)
+        {
+            foreach (var addedPreco in addedPrecos)
+            {
+                var preco = livro.Precos.Find(p => p.TipoDeVenda == addedPreco.TipoDeVenda);
+                if (preco is not null)
+                {
+                    preco.Preco = addedPreco.Preco;
+                    continue;
+                }
+
+                livro.Precos.Add(addedPreco);
+            }
+        }
+
         return livro;
     }
+
 }
