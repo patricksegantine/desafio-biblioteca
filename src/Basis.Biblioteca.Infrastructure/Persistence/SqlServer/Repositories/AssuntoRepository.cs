@@ -28,6 +28,11 @@ public class AssuntoRepository(BibliotecaContext context) : IAssuntoRepository
         return await _context.Assuntos.FindAsync(id, cancellationToken);
     }
 
+    public async Task<IEnumerable<Assunto>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken = default)
+    {
+        return await _context.Assuntos.Where(a => ids.Contains(a.CodAs)).ToListAsync(cancellationToken);
+    }
+
     public async Task<Assunto> UpdateAsync(Assunto assunto, CancellationToken cancellationToken = default)
     {
         _context.Assuntos.Update(assunto);

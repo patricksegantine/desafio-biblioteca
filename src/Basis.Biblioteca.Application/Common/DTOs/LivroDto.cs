@@ -1,6 +1,6 @@
 ﻿namespace Basis.Biblioteca.Application.Common.DTOs;
 
-public abstract record LivroDto
+public record LivroDto
 {
     public int CodL { get; set; }
     public string Titulo { get; set; } = default!;

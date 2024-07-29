@@ -16,6 +16,8 @@ public class CustomProfile : Profile
         CreateMap<Domain.Entities.PrecoVenda, PrecoVendaDto>()
             .ReverseMap();
 
-        CreateMap<CreateLivroRequest, Domain.Entities.Livro>();
+        CreateMap<CreateLivroRequest, Domain.Entities.Livro>()
+            .ForMember(dst => dst.Autores, opt => opt.Ignore())
+            .ForMember(dst => dst.Assuntos, opt => opt.Ignore());
     }
 }

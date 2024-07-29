@@ -1,8 +1,12 @@
 ﻿using Asp.Versioning;
+using Basis.Biblioteca.Application.Common.AutoMapper;
 using Basis.Biblioteca.Application.UseCases.Assunto.Search;
 using Basis.Biblioteca.Application.UseCases.Autor.Search;
 using Basis.Biblioteca.Application.UseCases.Livro.Create;
+using Basis.Biblioteca.Application.UseCases.Livro.Delete;
+using Basis.Biblioteca.Application.UseCases.Livro.Get;
 using Basis.Biblioteca.Application.UseCases.Livro.Search;
+using Basis.Biblioteca.Application.UseCases.Livro.Update;
 using Basis.Biblioteca.Domain.Repositories;
 using Basis.Biblioteca.Infrastructure.Persistence.SqlServer;
 using Basis.Biblioteca.Infrastructure.Persistence.SqlServer.Repositories;
@@ -42,11 +46,17 @@ public static class HostingExtensions
         builder.Services.AddScoped<ISearchAutorUsecase, SearchAutorUsecase>();
         builder.Services.AddScoped<ICreateLivroUsecase, CreateLivroUsecase>();
         builder.Services.AddScoped<ISearchLivroUsecase, SearchLivroUsecase>();
+        builder.Services.AddScoped<IGetLivroUsecase, GetLivroUsecase>();
+        builder.Services.AddScoped<IUpdateLivroUsecase, UpdateLivroUsecase>();
+        builder.Services.AddScoped<IDeleteLivroUsecase, DeleteLivroUsecase>();
 
         // Registrar os repositórios
         builder.Services.AddScoped<IAutorRepository, AutorRepository>();
         builder.Services.AddScoped<IAssuntoRepository, AssuntoRepository>();
         builder.Services.AddScoped<ILivroRepository, LivroRepository>();
+
+        // AutoMapper
+        builder.Services.AddAutoMapper(m => m.AddProfile<CustomProfile>());
 
         // Adiciona outros serviços
         builder.Services.AddControllers()

@@ -16,7 +16,7 @@ public class ExceptionMiddleware(RequestDelegate next)
         }
         catch (Exception ex)
         {
-            Log.Error($"Something went wrong: {ex}");
+            Log.Error(ex, "Something went wrong");
             await HandleExceptionAsync(httpContext, ex);
         }
     }

@@ -28,6 +28,11 @@ public class AutorRepository(BibliotecaContext context) : IAutorRepository
         return await _context.Autores.FindAsync(id, cancellationToken);
     }
 
+    public async Task<IEnumerable<Autor>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken = default)
+    {
+        return await _context.Autores.Where(a => ids.Contains(a.CodAu)).ToListAsync(cancellationToken);
+    }
+
     public async Task<Autor> UpdateAsync(Autor autor, CancellationToken cancellationToken = default)
     {
         _context.Autores.Update(autor);
