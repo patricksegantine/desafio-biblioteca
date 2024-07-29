@@ -10,7 +10,30 @@ public record UpdateLivroRequest
     public int? Edicao { get; set; }
     public string? AnoPublicacao { get; set; }
 
-    public List<int>? Autores { get; set; }
-    public List<int>? Assuntos { get; set; }
-    public List<PrecoVendaDto>? Precos { get; set; }
+    public List<UpdateAutorDto>? Autores { get; set; }
+    public List<UpdateAssuntoDto>? Assuntos { get; set; }
+    public List<UpdatePrecoVendaDto>? Precos { get; set; }
+}
+
+public record UpdateAutorDto
+{
+    public int CodAu { get; set; }
+    public UpdateActionType UpdateAction { get; set; }
+}
+
+public record UpdateAssuntoDto
+{
+    public int CodAs { get; set; }
+    public UpdateActionType UpdateAction { get; set; }
+}
+
+public record UpdatePrecoVendaDto: PrecoVendaDto
+{
+    public UpdateActionType UpdateAction { get; set; }
+}
+
+public enum UpdateActionType
+{
+    Added = 0,
+    Deleted = 1
 }
